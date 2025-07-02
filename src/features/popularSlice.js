@@ -32,12 +32,21 @@ const popularSlice = createSlice({
       state.type = action.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchPopular.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchPopular.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.items = action.payload;
+      })
+      .addCase(fetchPopular.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      });
+  },
 });
 
 export const { setType } = popularSlice.actions;
 export default popularSlice.reducer;
-export const selectPopular = (state) => ({
-  data: state.popular.items,
-  status: state.popular.status,
-  error: state.popular.error,
-});

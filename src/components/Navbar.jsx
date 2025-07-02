@@ -5,7 +5,6 @@ import NavbarModal from "./NavbarModal";
 
 export default function Navbar() {
   const [showDropdown, setShowDropdown] = useState(null);
-  const [showNavbar, setShowNavbar] = useState(true);
 
   const dropdownItems = {
     Movies: ["Popular", "Now Playing", "Upcoming", "Top Rated"],
@@ -17,9 +16,7 @@ export default function Navbar() {
   return (
     <div>
       <header
-        className={`bg-[#032541] text-white w-full transition-transform duration-300 z-50 fixed top-0 ${
-          showNavbar ? "translate-y-0" : "-translate-y-full"
-        }`}
+        className={`bg-[#032541] text-white w-full transition-transform duration-300 z-50 fixed top-0 `}
       >
         <div className="container mx-auto px-6 py-4 flex items-center justify-between relative">
           <div className="flex items-center space-x-6">

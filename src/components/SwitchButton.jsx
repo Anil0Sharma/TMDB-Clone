@@ -5,7 +5,10 @@ const SwitchButton = ({ labels = [], onSwitch }) => {
 
   const handleSwitch = (index) => {
     setActiveIndex(index);
-    if (onSwitch) onSwitch(labels[index]);
+    console.log(labels[index]);
+    if (onSwitch) {
+      onSwitch(labels[index]);
+    }
   };
 
   return (
@@ -20,6 +23,7 @@ const SwitchButton = ({ labels = [], onSwitch }) => {
                 ? "bg-blue-900 text-green-300"
                 : "bg-white text-blue-900"
             }`}
+          ///gpt///
           style={{
             borderRadius:
               index === 0
@@ -28,6 +32,7 @@ const SwitchButton = ({ labels = [], onSwitch }) => {
                 ? "0 9999px 9999px 0"
                 : "0",
           }}
+          ////gpt///
         >
           {label}
         </button>

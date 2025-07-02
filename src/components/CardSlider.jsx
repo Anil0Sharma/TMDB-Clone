@@ -1,42 +1,77 @@
-import React, { useEffect } from "react";
-import Card from "./Card";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchNowPlaying } from "../features/nowPlayingSlice";
+import Card from "./Card";
 import SwitchButton from "./SwitchButton";
 
-export default function CardSlider({ title, labels, bgimg }) {
+export default function CardSlider({
+  title,
+  labels = [],
+  fetchThunk,
+  selector,
+  sliceKey,
+  setTypeAction = null,
+}) {
   console.log("CardSlider rendered");
   const dispatch = useDispatch();
-  const { movies, status, error } = useSelector((state) => state.nowPlaying);
+  const containerRef = useRef();
+  const stateSlice = useSelector(selector);
   console.log("CardSlider rendered");
+  const { status, error } = stateSlice;
+  const data = stateSlice[sliceKey];
   console.log("CardSlider rendered");
-  console.log("CardSlider rendered");
-  console.log(movies);
+
+  const arrData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    const arr = [...data];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }, [data]);
+
   useEffect(() => {
-    dispatch(fetchNowPlaying());
-  }, [dispatch]);
+    dispatch(fetchThunk());
+    console.log("effect");
+  }, [dispatch, fetchThunk, stateSlice?.type]);
 
-  if (status === "loading") return <p className="text-white">Loading...</p>;
-  if (status === "failed")
-    return <p className="text-red-500">Error: {error}</p>;
+  const handleSwitch = (label) => {
+    if (!setTypeAction) return;
+    const contentType = label.toLowerCase() === "tv" ? "tv" : "movie";
+    dispatch(setTypeAction(contentType));
 
-  console.log("movies:", movies);
-  console.log("status:", status);
+    //gpt
+    containerRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+  //
+
   return (
-    <div className="">
-      <div className="flex items-center gap-10 p-4">
-        <h2 className="text-xl text-black font-bold mb-4 ml-20 pt-4">
-          {title}
-        </h2>
-        <SwitchButton labels={labels} />
-      </div>
-      <div className="flex overflow-x-auto gap-4 pb-4 pl-10 scrollbar-hide">
-        {movies?.length > 0 ? (
-          movies?.map((movie) => <Card key={movie.id} movie={movie} />)
-        ) : (
-          <p className="text-white">No movies found</p>
+    <div ref={containerRef} className="py-6">
+      <div className="flex items-center gap-10 px-6 mb-4">
+        <h2 className="text-xl text-black font-bold">{title}</h2>
+        {labels.length > 0 && (
+          <SwitchButton labels={labels} onSwitch={handleSwitch} />
         )}
       </div>
+
+      {status === "loading" ? (
+        <div className="min-h-[300px] text-white flex justify-center items-center">
+          Loading...
+        </div>
+      ) : status === "failed" ? (
+        <p className="text-red-500 px-6">Error: {error}</p>
+      ) : arrData.length > 0 ? (
+        <div className="flex overflow-x-auto gap-4 px-6 scrollbar-hide overflow-y-hidden">
+          {arrData.map((movie) => (
+            <Card key={movie.id} movie={movie} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-white px-6">No movies found.</p>
+      )}
     </div>
   );
 }
