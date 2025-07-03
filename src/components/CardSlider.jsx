@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Card from "./Card";
 import SwitchButton from "./SwitchButton";
+import CardSliderLoader from "./CardSliderLoader";
 
 export default function CardSlider({
   title,
@@ -41,16 +42,16 @@ export default function CardSlider({
     dispatch(setTypeAction(contentType));
 
     //gpt
-    containerRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    //   containerRef.current?.scrollIntoView({
+    //     behavior: "smooth",
+    //     block: "start",
+    //   });
   };
   //
 
   return (
     <div ref={containerRef} className="py-6">
-      <div className="flex items-center gap-10 px-6 mb-4">
+      <div className="flex items-center gap-10 px-6 mb-4 loading">
         <h2 className="text-xl text-black font-bold">{title}</h2>
         {labels.length > 0 && (
           <SwitchButton labels={labels} onSwitch={handleSwitch} />
@@ -58,15 +59,13 @@ export default function CardSlider({
       </div>
 
       {status === "loading" ? (
-        <div className="min-h-[300px] text-white flex justify-center items-center">
-          Loading...
-        </div>
+        <CardSliderLoader />
       ) : status === "failed" ? (
         <p className="text-red-500 px-6">Error: {error}</p>
       ) : arrData.length > 0 ? (
         <div className="flex overflow-x-auto gap-4 px-6 scrollbar-hide overflow-y-hidden">
           {arrData.map((movie) => (
-            <Card key={movie.id} movie={movie} />
+            <Card key={movie.id} movie={movie} type={stateSlice.type} />
           ))}
         </div>
       ) : (
