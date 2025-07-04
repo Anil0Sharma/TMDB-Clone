@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchNowPlaying } from "../features/nowPlayingSlice";
 const WelcomeBanner = () => {
@@ -11,11 +11,22 @@ const WelcomeBanner = () => {
     }
   }, [dispatch, status]);
 
-  const random = Math.floor(Math.random() * 10);
-  console.log(random);
-  const bgImage = movies?.[random]?.backdrop_path
-    ? `https://image.tmdb.org/t/p/original${movies[random].backdrop_path}`
-    : "https://image.tmdb.org/t/p/original/8YFL5QQVPy3AgrEQxNYVSgiPEbe.jpg";
+  const bgImage = useMemo(() => {
+    if (status !== "succeeded" || !movies.length) {
+      return "https://image.tmdb.org/t/p/original/8YFL5QQVPy3AgrEQxNYVSgiPEbe.jpg";
+    }
+    const random = Math.floor(Math.random() * movies.length);
+    return `https://image.tmdb.org/t/p/original${movies[random]?.backdrop_path}`;
+  }, [movies, status]);
+
+  if (status !== "succeeded") {
+    // Optional loading fallback
+    return (
+      <div className="h-[250px] md:h-[320px] bg-black flex items-center justify-center text-white text-lg">
+        Loading banner...
+      </div>
+    );
+  }
   return (
     <section className="relative h-[300px] w-full">
       <img
