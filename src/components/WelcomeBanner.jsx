@@ -1,10 +1,25 @@
-import React from "react";
-
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchNowPlaying } from "../features/nowPlayingSlice";
 const WelcomeBanner = () => {
+  const dispatch = useDispatch();
+  const { movies, status } = useSelector((state) => state.nowPlaying);
+
+  useEffect(() => {
+    if (status === "idle") {
+      dispatch(fetchNowPlaying());
+    }
+  }, [dispatch, status]);
+
+  const random = Math.floor(Math.random() * 10);
+  console.log(random);
+  const bgImage = movies?.[random]?.backdrop_path
+    ? `https://image.tmdb.org/t/p/original${movies[random].backdrop_path}`
+    : "https://image.tmdb.org/t/p/original/8YFL5QQVPy3AgrEQxNYVSgiPEbe.jpg";
   return (
     <section className="relative h-[300px] w-full">
       <img
-        src="https://image.tmdb.org/t/p/original/8YFL5QQVPy3AgrEQxNYVSgiPEbe.jpg"
+        src={bgImage}
         alt="Banner"
         className="absolute w-full h-full object-cover"
       />

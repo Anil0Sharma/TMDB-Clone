@@ -10,7 +10,7 @@ export default function JoinToday() {
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
         />
-
+        <div className="absolute inset-0 bg-black/70"></div>
         <div className="relative z-10 max-w-6xl mx-auto h-full flex items-center px-4 sm:px-6">
           <div className="text-white max-w-2xl">
             <h2 className="text-2xl md:text-4xl sm:text-3xl font-bold mb-3">

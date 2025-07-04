@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Card from "./Card";
 import SwitchButton from "./SwitchButton";
@@ -14,7 +14,6 @@ export default function CardSlider({
 }) {
   console.log("CardSlider rendered");
   const dispatch = useDispatch();
-  const containerRef = useRef();
   const stateSlice = useSelector(selector);
   console.log("CardSlider rendered");
   const { status, error } = stateSlice;
@@ -42,15 +41,11 @@ export default function CardSlider({
     dispatch(setTypeAction(contentType));
 
     //gpt
-    //   containerRef.current?.scrollIntoView({
-    //     behavior: "smooth",
-    //     block: "start",
-    //   });
   };
   //
 
   return (
-    <div ref={containerRef} className="py-6">
+    <div className="py-6">
       <div className="flex items-center gap-10 px-6 mb-4 loading">
         <h2 className="text-xl text-black font-bold">{title}</h2>
         {labels.length > 0 && (

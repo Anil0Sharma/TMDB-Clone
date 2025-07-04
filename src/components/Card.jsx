@@ -17,7 +17,7 @@ export default function Card({ movie, type }) {
           <img
             src={poster}
             alt={title}
-            className="rounded-lg w-full h-[200px] sm:h-[240px] md:h-[270px] object-cover "
+            className="rounded-lg w-full h-[200px] sm:h-[240px] md:h-[270px] object-cover"
           />
           <div className="absolute bottom-[-12px] sm:bottom-[-14px] md:bottom-[-16px] left-2 w-8 sm:w-9 md:w-10 h-8 sm:h-9 md:h-10 rounded-full bg-white border-2 sm:border-3 md:border-4 border-green-600 flex items-center justify-center text-[10px] sm:text-xs md:text-sm font-bold text-green-700 shadow-lg">
             {rating}%

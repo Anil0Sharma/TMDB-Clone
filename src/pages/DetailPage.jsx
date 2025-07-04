@@ -1,19 +1,39 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router";
 import { clearDetail, fetchDetails } from "../features/detailSlice";
 import Loader from "../components/Loader";
+import { GiExpand } from "react-icons/gi";
+import MovieTrailer from "../components/MovieTrailer";
+import { fetchCrew, resetCrew } from "../features/crewSlice";
+
+import CastCard from "../components/CastCard";
 
 export default function DetailPage() {
   const { type, id } = useParams();
   const dispatch = useDispatch();
   const { item, status, error } = useSelector((state) => state.detail);
+  const crewState = useSelector((state) => state.crew);
+  const crewStatus = crewState.status;
+  const crewDetail = crewState.crewDetail;
+  const castDetail = crewState.castDetail;
+  const commonJobs = ["Director", "Screenplay", "Story", "Characters"];
 
+  const filteredCrew = crewDetail.filter((member) =>
+    commonJobs.includes(member.job)
+  );
+
+  const displayCrew = filteredCrew.slice(0, 6);
+  const castPreview = castDetail.slice(0, 10);
+
+  const [toggleTrailer, setToggleTrailer] = useState(false);
   useEffect(() => {
     dispatch(fetchDetails({ type, id }));
+    dispatch(fetchCrew({ type, id }));
 
     return () => {
       dispatch(clearDetail());
+      dispatch(resetCrew());
     };
   }, [dispatch, type, id]);
 
@@ -22,7 +42,8 @@ export default function DetailPage() {
   if (status === "failed")
     return <p className="text-red-500">Error: {error}</p>;
   if (!item) return null;
-
+  if (!crewDetail) return <p>Loading...</p>;
+  if (!castDetail) return <p>Loading...</p>;
   const {
     title,
     name,
@@ -35,6 +56,10 @@ export default function DetailPage() {
     release_date,
     first_air_date,
     runtime,
+    status: movieStatus,
+    original_language,
+    budget,
+    revenue,
   } = item;
 
   const bgUrl = `https://image.tmdb.org/t/p/original${backdrop_path}`;
@@ -42,6 +67,10 @@ export default function DetailPage() {
   const disTitle = title || name;
   const date = release_date || first_air_date;
   const rating = Math.round(vote_average * 10);
+
+  function handleTrailerClick() {
+    setToggleTrailer(!toggleTrailer);
+  }
   return (
     <div
       className="bg-cover bg-center min-h-screen"
@@ -67,12 +96,19 @@ export default function DetailPage() {
       </div>
 
       <div className="flex flex-col md:flex-row gap-8 px-10 py-12 text-white">
-        <div className="w-full md:w-[300px]">
+        <div className="w-full md:w-[300px] relative group">
           <img
             src={posterUrl}
             alt={disTitle}
-            className="rounded-lg shadow0lg w-full"
+            className="rounded-lg shadow-lg w-full"
           />
+          <div className="absolute bg-black opacity-0 inset-0 rounded-lg group-hover:opacity-60 transition-opacity duration-300 flex items-center justify-center">
+            <span>
+              <a href="/">
+                <GiExpand size={30} />
+              </a>
+            </span>
+          </div>
         </div>
 
         <div className="flex flex-col justify-center w-full md:w-[70%]">
@@ -96,12 +132,72 @@ export default function DetailPage() {
           <p className="mt-2 text-gray-200">{overview}</p>
 
           <div className="mt-6 flex gap-4">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            <button
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              onClick={handleTrailerClick}
+            >
               Play Trailer
+              {toggleTrailer ? <MovieTrailer type={type} id={id} /> : <></>}
             </button>
+
             <button className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-800">
               Add to List
             </button>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 p-4 mt-6 text-white">
+            {displayCrew.map((person) => (
+              <div key={person.credit_id}>
+                <h3 className="font-bold">{person.name}</h3>
+                <p className="text-sm">{person.job}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* CAST SLIDER */}
+      <div className="bg-white px-6 py-10 overflow-hidden">
+        <div className="flex flex-col md:flex-row justify-between gap-8">
+          {/* Cast Section */}
+          <div className="md:w-3/4">
+            <h2 className="text-xl font-semibold mb-4 text-black">
+              Top Billed Cast
+            </h2>
+            <div className="flex gap-4 pr-4 pb-2 overflow-x-auto scrollbar-hide scroll-smooth ">
+              {castDetail.slice(0, 9).map((cast) => (
+                <div key={cast.id}>
+                  <CastCard cast={cast} />
+                </div>
+              ))}
+              <div className="flex items-center justify-center px-4 text-black font-semibold hover:underline cursor-pointer">
+                View More →
+              </div>
+            </div>
+          </div>
+
+          {/* RIght Side */}
+          <div className="md:w-1/4 shrink-0 text-sm text-black">
+            <h2 className="text-lg font-semibold mb-4">Info</h2>
+            <p className="mb-2">
+              <strong>Status:</strong> {item.status || "Not Available"}
+            </p>
+            <p className="mb-2">
+              <strong>Original Language:</strong>{" "}
+              {item.original_language?.toUpperCase() || "N/A"}
+            </p>
+            <p className="mb-2">
+              <strong>Budget:</strong>{" "}
+              {item.budget
+                ? `$${item.budget.toLocaleString()}`
+                : "Not Available"}
+            </p>
+            <p className="mb-2">
+              <strong>Revenue:</strong>{" "}
+              {item.revenue
+                ? `$${item.revenue.toLocaleString()}`
+                : "Not Available"}
+            </p>
           </div>
         </div>
       </div>

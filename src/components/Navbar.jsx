@@ -23,7 +23,9 @@ export default function Navbar() {
       >
         <div className="container mx-auto px-6 py-4 flex items-center justify-between relative">
           <div className="flex items-center space-x-6">
-            <img src={logo} alt="TMDB Logo" className="h-6" />
+            <a href="/">
+              <img src={logo} alt="TMDB Logo" className="h-6" />
+            </a>
             <nav className="hidden md:flex space-x-6 text-sm font-semibold relative">
               {Object.keys(dropdownItems).map((key) => (
                 <div
